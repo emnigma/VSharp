@@ -80,10 +80,16 @@ def play_map(with_agent: NAgent, with_model: Predictor, steps: int) -> Mutable2R
         if gameover.actual_coverage is not None:
             actual_coverage = gameover.actual_coverage
 
-    computed_coverage, vertexes_in_zone = covered(game_state)
-    computed_coverage += last_step_covered
+    covered_by_test_blocks, in_coverage_zone_blocks = covered(game_state)
+    covered_by_test_blocks += last_step_covered
 
-    coverage_percent = computed_coverage / vertexes_in_zone * 100
+    coverage_percent = covered_by_test_blocks / in_coverage_zone_blocks * 100
+
+    if coverage_percent > 100:
+        logging.critical(
+            f"coverage percent >100, {covered_by_test_blocks=}, {in_coverage_zone_blocks=}\n"
+            f"GameState:{game_state}"
+        )
 
     actual_report = (
         f", actual coverage: {actual_coverage:.2f}"
