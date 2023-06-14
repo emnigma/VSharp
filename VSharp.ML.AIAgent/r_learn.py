@@ -88,7 +88,7 @@ def play_map(with_agent: NAgent, with_model: Predictor, steps: int) -> Mutable2R
     if coverage_percent > 100:
         logging.critical(
             f"coverage percent >100, {covered_by_test_blocks=}, {in_coverage_zone_blocks=}\n"
-            f"GameState:{game_state}"
+            f"GameState:{game_state.to_json()}"
         )
 
     actual_report = (
