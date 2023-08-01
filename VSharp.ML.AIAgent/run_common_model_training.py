@@ -3,9 +3,9 @@ from common.constants import DEVICE
 from learning.play_game import play_game
 from config import GeneralConfig
 from connection.game_server_conn.utils import MapsType
-from models import CommonModel
-from wrapper import CommonModelWrapper
-from utils import csv2best_models, euclidean_dist
+from ml.common_model.models import CommonModel
+from ml.common_model.wrapper import CommonModelWrapper
+from ml.common_model.utils import csv2best_models, euclidean_dist
 
 
 def main():

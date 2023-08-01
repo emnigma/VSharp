@@ -4,7 +4,7 @@ from common.game import GameState
 from ml.data_loader_compact import ServerDataloaderHeteroVector
 from ml.model_wrappers.protocols import Predictor
 from ml.predict_state_vector_hetero import PredictStateVectorHetGNN
-from utils import back_prop
+from ml.common_model.utils import back_prop
 
 
 class CommonModelWrapper(Predictor):
