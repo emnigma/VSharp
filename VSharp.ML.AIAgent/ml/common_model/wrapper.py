@@ -1,4 +1,5 @@
 import torch
+import copy
 
 from common.game import GameState
 from ml.data_loader_compact import ServerDataloaderHeteroVector
@@ -12,11 +13,17 @@ class CommonModelWrapper(Predictor):
         self.model = model
         self.best_models = best_models
         self._model = model
+        # self.name = sum(torch.cat([p.view(-1) for p in self.model.parameters()], dim=0))
         self.optimizer = optimizer
         self.criterion = criterion
 
-    def name(self) -> str:
-        return "MY AWESOME MODEL"
+    def name(self):
+        return "Common model"
+
+    def update(self, map_name, map_result):
+        map_result = map_result.actual_coverage_percent
+        if self.best_models[map_name][1] <= map_result:
+            self.best_models[map_name] = (copy.deepcopy(self.model), map_result)
 
     def model(self):
         return self._model
@@ -31,7 +38,7 @@ class CommonModelWrapper(Predictor):
             self.model, hetero_input, state_map
         )
 
-        back_prop(self.best_models[map_name], self.model, hetero_input, self.optimizer, self.criterion)
+        back_prop(self.best_models[map_name][0], self.model, hetero_input, self.optimizer, self.criterion)
 
         del hetero_input
         return next_step_id
