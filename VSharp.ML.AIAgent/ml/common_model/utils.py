@@ -1,11 +1,13 @@
-import torch
-from common.constants import DEVICE
+import ast
+import csv
 import os
 import re
-import csv
 
-from ml.models import SAGEConvModel
+import torch
+
+from common.constants import DEVICE
 from ml.common_model.paths import csv_path, models_path
+from ml.models import SAGEConvModel
 
 
 def euclidean_dist(y_pred, y_true):
@@ -22,21 +24,21 @@ def euclidean_dist(y_pred, y_true):
 
 
 def get_last_epoch_num(path):
-    epochs = list(map(lambda x: re.findall('[0-9]+', x), os.listdir(path)))
+    epochs = list(map(lambda x: re.findall("[0-9]+", x), os.listdir(path)))
     return str(sorted(epochs)[-1][0])
 
 
 def csv2best_models():
     best_models = {}
-    path_to_csv = os.path.join(csv_path, get_last_epoch_num(csv_path) + '.csv')
-    with open(path_to_csv, 'r') as csv_file:
+    path_to_csv = os.path.join(csv_path, get_last_epoch_num(csv_path) + ".csv")
+    with open(path_to_csv, "r") as csv_file:
         csv_reader = csv.reader(csv_file)
         map_names = next(csv_reader)[1:]
         models = []
         for row in csv_reader:
             models_stat = dict()
             # int_row = list(map(lambda x: tuple(map(lambda y: int(y), x[1:-1].split(", "))), row[1:]))
-            int_row = list(map(lambda x: int(x), row[1:]))
+            int_row = list(map(lambda x: ast.literal_eval(x), row[1:]))
             for i in range(len(int_row)):
                 models_stat[map_names[i]] = int_row[i]
             models.append((row[0], models_stat))
@@ -46,7 +48,11 @@ def csv2best_models():
             best_model_name = best_model[0]
             best_model_score = best_model[1]
             ref_model = SAGEConvModel(16)
-            path_to_model = os.path.join(models_path, "epoch_" + get_last_epoch_num(models_path),  best_model_name + ".pth")
+            path_to_model = os.path.join(
+                models_path,
+                "epoch_" + get_last_epoch_num(models_path),
+                best_model_name + ".pth",
+            )
             ref_model.load_state_dict(torch.load(path_to_model))
             ref_model.to(DEVICE)
             best_models[map_name] = (ref_model, best_model_score[map_name])
@@ -60,7 +66,7 @@ def back_prop(best_model, model, data, optimizer, criterion):
     out = model(data.x_dict, data.edge_index_dict, data.edge_attr_dict)
     y_true = best_model(data.x_dict, data.edge_index_dict, data.edge_attr_dict)
     if abs(torch.min(y_true)) > 1:
-        y_true = 1/y_true
+        y_true = 1 / y_true
     # print(out, "\n", y_true)
     loss = criterion(out, y_true)
     # print('loss:', loss)
