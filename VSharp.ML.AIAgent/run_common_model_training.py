@@ -60,6 +60,7 @@ def main():
         )
         table, _, _ = create_pivot_table({cmwrapper: result})
         table = table_to_string(table)
+        append_to_file(TABLES_PATH, f"Epoch#{epoch}" + "\n")
         append_to_file(TABLES_PATH, table + "\n")
 
 
