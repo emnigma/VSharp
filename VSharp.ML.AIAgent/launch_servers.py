@@ -3,97 +3,131 @@ import json
 import os
 import signal
 import subprocess
-from contextlib import contextmanager, nullcontext
+from contextlib import contextmanager
 from queue import Empty, Queue
 
-from aiohttp import web
+from flask import Flask, Response, jsonify, render_template, request, url_for
 
-from config import GeneralConfig, BrokerConfig, ServerConfig
+from common.constants import SERVER_WORKING_DIR
+from config import BrokerConfig, FeatureConfig, GeneralConfig, ServerConfig
+from connection.broker_conn.classes import ServerInstanceInfo, Undefined, WSUrl
 
-routes = web.RouteTableDef()
+app = Flask(__name__)
 
 
-@routes.get("/get_ws")
-async def dequeue_ws(request):
+@app.route("/get_ws", methods=["GET"])
+def dequeue_instance():
     try:
-        ws = WS_URLS.get(timeout=0.1)
-        print(f"issued {ws}")
-        return web.Response(text=ws)
+        server_info = SERVER_INSTANCES.get(timeout=0.1)
+        print(f"issued {server_info}")
+        return app.make_response(server_info.to_json())
     except Empty as e:
-        print(
-            "Exception occured when trying to get socket! Make sure that server count is the same as in main.py"
+        print(f"{os.getpid()} tried to dequeue an empty queue. Waiting...")
+        return app.make_response(str(e))
+
+
+@app.route("/post_ws", methods=["POST"])
+def enqueue_instance():
+    returned_instance_info_raw = request.get_data()
+    returned_instance_info = ServerInstanceInfo.from_json(
+        returned_instance_info_raw.decode("utf-8")
+    )
+
+    print(f"put back {returned_instance_info}")
+    if FeatureConfig.ON_GAME_SERVER_RESTART:
+        kill_server(returned_instance_info.pid, forget=True)
+        returned_instance_info = run_server_instance(
+            port=returned_instance_info.port, start_server=START_SERVERS
         )
-        return web.Response(text=str(e))
+
+    SERVER_INSTANCES.put(returned_instance_info)
+    return jsonify(success=True)
 
 
-@routes.post("/post_ws")
-async def enqueue_ws(request):
-    returning_ws_raw = await request.read()
-    returning_ws = returning_ws_raw.decode("utf-8")
-    print(f"put back {returning_ws}")
-    WS_URLS.put(returning_ws)
-    return web.HTTPOk()
-
-
-@routes.post("/send_res")
-async def append_results(request):
+@app.route("/send_res", methods=["POST"])
+def append_results():
     global RESULTS
-    data = await request.read()
+    data = request.get_data()
     decoded = data.decode("utf-8")
     RESULTS.append(decoded)
-    return web.HTTPOk()
+    return jsonify(success=True)
 
 
-@routes.get("/recv_res")
-async def send_and_clear_results(request):
+@app.route("/recv_res", methods=["GET"])
+def send_and_clear_results():
     global RESULTS
     if not RESULTS:
         raise RuntimeError("Must play a game first")
-    rst = json.dumps(RESULTS)
+    rst = jsonify(RESULTS)
     RESULTS = []
-    return web.Response(text=rst)
+    return rst
 
 
-def run_servers(num_inst: int, start_port: int) -> list[subprocess.Popen]:
-    # assuming we start from /VSharp/VSharp.ML.AIAgent
-    working_dir = "../VSharp.ML.GameServer.Runner/bin/Release/net6.0/"
+def get_socket_url(port: int) -> WSUrl:
+    return f"ws://0.0.0.0:{port}/gameServer"
+
+
+def run_server_instance(port: int, start_server: bool) -> ServerInstanceInfo:
     launch_server = [
         "dotnet",
         "VSharp.ML.GameServer.Runner.dll",
         "--checkactualcoverage",
         "--port",
     ]
-
-    procs = []
-    for i in range(num_inst):
+    server_pid = Undefined
+    if start_server:
         proc = subprocess.Popen(
-            launch_server + [str(start_port + i)],
+            launch_server + [str(port)],
             start_new_session=True,
-            cwd=working_dir,
+            cwd=SERVER_WORKING_DIR,
         )
-        procs.append(proc)
-        print(f"{proc.pid}: " + " ".join(launch_server + [str(start_port + i)]))
+        server_pid = proc.pid
+        PROCS.append(server_pid)
+        print(f"{server_pid}: " + " ".join(launch_server + [str(port)]))
 
-    return procs
+    ws_url = get_socket_url(port)
+    return ServerInstanceInfo(port, ws_url, server_pid)
 
 
-def kill_servers(procs: list[subprocess.Popen]):
-    for proc in procs:
-        os.kill(proc.pid, signal.SIGTERM)
-        print(f"killed {proc.pid}")
+def run_servers(
+    num_inst: int, start_port: int, start_servers: bool
+) -> list[ServerInstanceInfo]:
+    servers_info = []
+    for i in range(num_inst):
+        server_info = run_server_instance(start_port + i, start_server=start_servers)
+        servers_info.append(server_info)
+
+    return servers_info
+
+
+def kill_server(pid: int, forget):
+    os.kill(pid, signal.SIGKILL)
+    if forget:
+        PROCS.remove(pid)
+    print(f"killed {pid}")
 
 
 @contextmanager
-def process_manager(num_inst: int):
-    procs = run_servers(num_inst, ServerConfig.VSHARP_INSTANCES_START_PORT)
+def server_manager(server_queue: Queue[ServerInstanceInfo], start_servers: bool):
+    global PROCS
+    servers_info = run_servers(
+        num_inst=GeneralConfig.SERVER_COUNT,
+        start_port=ServerConfig.VSHARP_INSTANCES_START_PORT,
+        start_servers=start_servers,
+    )
+
+    for server_info in servers_info:
+        server_queue.put(server_info)
     try:
         yield
     finally:
-        kill_servers(procs)
+        for proc in PROCS:
+            kill_server(proc, forget=False)
+        PROCS = []
 
 
 def main():
-    global WS_URLS, RESULTS
+    global SERVER_INSTANCES, PROCS, RESULTS, START_SERVERS
     parser = argparse.ArgumentParser(description="V# instances launcher")
     parser.add_argument(
         "--debug",
@@ -101,24 +135,15 @@ def main():
         help="dont launch servers if set",
     )
     args = parser.parse_args()
+    START_SERVERS = not args.debug
 
-    SOCKET_URLS = [
-        f"ws://0.0.0.0:{ServerConfig.VSHARP_INSTANCES_START_PORT + i}/gameServer"
-        for i in range(GeneralConfig.SERVER_COUNT)
-    ]
-
-    WS_URLS = Queue()
+    # Queue[ServerInstanceInfo]
+    SERVER_INSTANCES = Queue()
+    PROCS = []
     RESULTS = []
 
-    for ws_url in SOCKET_URLS:
-        WS_URLS.put(ws_url)
-
-    with process_manager(
-        GeneralConfig.SERVER_COUNT
-    ) if not args.debug else nullcontext():
-        app = web.Application()
-        app.add_routes(routes)
-        web.run_app(app, port=BrokerConfig.BROKER_PORT)
+    with server_manager(SERVER_INSTANCES, start_servers=START_SERVERS):
+        app.run(host="0.0.0.0", port=BrokerConfig.BROKER_PORT, debug=False)
 
 
 if __name__ == "__main__":
