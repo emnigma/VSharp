@@ -4,10 +4,10 @@ from torch_geometric.nn import Linear
 
 from learning.timer.wrapper import timeit
 
-from .models import StateGNNEncoderConvEdgeAttr
+from .models import StateGNNEncoderConvEdgeAttrCompact
 
 
-class StateGNNEncoderConvEdgeAttrExport(StateGNNEncoderConvEdgeAttr):
+class StateGNNEncoderConvEdgeAttrExport(StateGNNEncoderConvEdgeAttrCompact):
     def __init__(self, hidden_channels, out_channels):
         super().__init__(hidden_channels, out_channels)
         self.lin_last = Linear(out_channels, 1)
