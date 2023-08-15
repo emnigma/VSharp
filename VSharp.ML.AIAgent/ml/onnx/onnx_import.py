@@ -45,8 +45,13 @@ def export_onnx_model(model: torch.nn.Module, save_path: str, opset_ver: int = N
         f=save_path,
         verbose=False,
         do_constant_folding=True,
+        dynamic_axes={
+            "x_dict": [0, 1],
+            "edge_index_dict": [0, 1],
+            "edge_attr_dict": [0, 1],
+        },
         input_names=["x_dict", "edge_index_dict", "edge_attr_dict"],
-        output_names=["out"],
+        output_names=["out", "other_out"],
         opset_version=opset_ver,
     )
 
@@ -56,6 +61,7 @@ def export_onnx_model(model: torch.nn.Module, save_path: str, opset_ver: int = N
 
 def check_onnx_model(path: str, check_against):
     model = onnx.load(path)
+    print(model)
     onnx.checker.check_model(model)
     print(onnx.helper.printable_graph(model.graph))
 

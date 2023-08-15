@@ -364,22 +364,22 @@ class StateGNNEncoder(torch.nn.Module):
     def forward(self, x_dict, edge_index_dict):
         game_x = self.conv1(
             x_dict["game_vertex"],
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
 
         state_x = self.conv2(
             x_dict["state_vertex"],
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
 
         state_x = self.conv3(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv4(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         return self.lin(state_x)
@@ -403,22 +403,22 @@ class StateGNNEncoderConv(torch.nn.Module):
     def forward(self, x_dict, edge_index_dict):
         game_x = self.conv1(
             x_dict["game_vertex"],
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
 
         state_x = self.conv2(
             x_dict["state_vertex"],
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
 
         state_x = self.conv3(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv4(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         return self.lin(state_x)
@@ -436,22 +436,22 @@ class StateGNNEncoderConvTAG100hops(torch.nn.Module):
     def forward(self, x_dict, edge_index_dict):
         game_x = self.conv1(
             x_dict["game_vertex"],
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
 
         state_x = self.conv2(
             x_dict["state_vertex"],
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
 
         state_x = self.conv3(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv4(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         return self.lin(state_x)
@@ -471,34 +471,34 @@ class StateGNNEncoderConvEdgeAttr(torch.nn.Module):
     def forward(self, x_dict, edge_index_dict, edge_attr=None):
         game_x = self.conv1(
             x_dict["game_vertex"],
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
 
         state_x = self.conv2(
             x_dict["state_vertex"],
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
 
         state_x = self.conv3(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
-            edge_attr[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
+            edge_attr["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv32(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
-            edge_attr[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
+            edge_attr["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv4(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         state_x = self.conv42(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         return self.lin(state_x)
@@ -526,42 +526,42 @@ class StateGNNEncoderConvExp(torch.nn.Module):
     def forward(self, x_dict, edge_index_dict):
         game_x = self.conv1(
             x_dict["game_vertex"],
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
 
         game_x = self.conv12(
             game_x,
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
 
         state_x = self.conv2(
             x_dict["state_vertex"],
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
 
         state_x = self.conv22(
             state_x,
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
 
         state_x = self.conv3(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv32(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv4(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         state_x = self.conv42(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         return self.lin(state_x)
@@ -583,42 +583,42 @@ class StateGNNEncoderConv(torch.nn.Module):
     def forward(self, x_dict, edge_index_dict):
         game_x = self.conv1(
             x_dict["game_vertex"],
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
 
         game_x = self.conv12(
             game_x,
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
 
         state_x = self.conv2(
             x_dict["state_vertex"],
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
 
         state_x = self.conv22(
             state_x,
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
 
         state_x = self.conv3(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv32(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
         ).relu()
 
         state_x = self.conv4(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         state_x = self.conv42(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "in", "state_vertex")],
+            edge_index_dict["game_vertex in state_vertex"],
         ).relu()
 
         return self.lin(state_x)

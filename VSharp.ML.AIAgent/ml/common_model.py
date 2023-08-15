@@ -59,43 +59,43 @@ class CommonModel(torch.nn.Module):
     def forward(self, x_dict, edge_index_dict, edge_attr_dict):
         game_x = self.gv_layers[0](
             x_dict["game_vertex"],
-            edge_index_dict[("game_vertex", "to", "game_vertex")],
+            edge_index_dict["game_vertex to game_vertex"],
         ).relu()
         for layer in self.gv_layers[1:]:
             game_x = layer(
                 game_x,
-                edge_index_dict[("game_vertex", "to", "game_vertex")],
+                edge_index_dict["game_vertex to game_vertex"],
             ).relu()
 
         state_x = self.sv_layers[0](
             x_dict["state_vertex"],
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
         for layer in self.sv_layers[1:]:
             state_x = layer(
                 state_x,
-                edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+                edge_index_dict["state_vertex parent_of state_vertex"],
             ).relu()
 
         history_x = self.history1(
             (game_x, state_x),
-            edge_index_dict[("game_vertex", "history", "state_vertex")],
+            edge_index_dict["game_vertex history state_vertex"],
             edge_attr_dict,
             size=(game_x.size(0), state_x.size(0)),
         ).relu()
 
         in_x = self.in1(
-            (game_x, history_x), edge_index_dict[("game_vertex", "in", "state_vertex")]
+            (game_x, history_x), edge_index_dict["game_vertex in state_vertex"]
         ).relu()
 
         state_x = self.sv_layers2[0](
             in_x,
-            edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+            edge_index_dict["state_vertex parent_of state_vertex"],
         ).relu()
         for layer in self.sv_layers2[1:]:
             state_x = layer(
                 state_x,
-                edge_index_dict[("state_vertex", "parent_of", "state_vertex")],
+                edge_index_dict["state_vertex parent_of state_vertex"],
             ).relu()
         x = self.mlp(in_x)
         return x

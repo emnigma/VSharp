@@ -124,15 +124,15 @@ class ServerDataloaderHeteroVector:
 
         data["game_vertex"].x = torch.tensor(np.array(nodes_vertex), dtype=torch.float)
         data["state_vertex"].x = torch.tensor(np.array(nodes_state), dtype=torch.float)
-        data["game_vertex", "to", "game_vertex"].edge_index = (
+        data["game_vertex to game_vertex"].edge_index = (
             torch.tensor(np.array(edges_index_v_v), dtype=torch.long).t().contiguous()
         )
-        data["state_vertex", "in", "game_vertex"].edge_index = (
+        data["state_vertex in game_vertex"].edge_index = (
             torch.tensor(np.array(edges_index_s_v_in), dtype=torch.long)
             .t()
             .contiguous()
         )
-        data["game_vertex", "in", "state_vertex"].edge_index = (
+        data["game_vertex in state_vertex"].edge_index = (
             torch.tensor(np.array(edges_index_v_s_in), dtype=torch.long)
             .t()
             .contiguous()
@@ -149,24 +149,24 @@ class ServerDataloaderHeteroVector:
                 else torch.empty((2, 0), dtype=torch.int64)
             )
 
-        data["state_vertex", "history", "game_vertex"].edge_index = null_if_empty(
+        data["state_vertex history game_vertex"].edge_index = null_if_empty(
             torch.tensor(np.array(edges_index_s_v_history), dtype=torch.long)
             .t()
             .contiguous()
         )
-        data["game_vertex", "history", "state_vertex"].edge_index = null_if_empty(
+        data["game_vertex history state_vertex"].edge_index = null_if_empty(
             torch.tensor(np.array(edges_index_v_s_history), dtype=torch.long)
             .t()
             .contiguous()
         )
-        data["state_vertex", "history", "game_vertex"].edge_attr = torch.tensor(
+        data["state_vertex history game_vertex"].edge_attr = torch.tensor(
             np.array(edges_attr_s_v), dtype=torch.long
         )
-        data["game_vertex", "history", "state_vertex"].edge_attr = torch.tensor(
+        data["game_vertex history state_vertex"].edge_attr = torch.tensor(
             np.array(edges_attr_v_s), dtype=torch.long
         )
         # if (edges_index_s_s): #TODO: empty?
-        data["state_vertex", "parent_of", "state_vertex"].edge_index = null_if_empty(
+        data["state_vertex parent_of state_vertex"].edge_index = null_if_empty(
             torch.tensor(np.array(edges_index_s_s), dtype=torch.long).t().contiguous()
         )
         # print(data['state', 'parent_of', 'state'].edge_index)
