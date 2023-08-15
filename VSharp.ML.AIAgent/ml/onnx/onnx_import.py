@@ -1,5 +1,6 @@
 import json
 
+import numpy as np
 import onnx
 import onnxruntime
 import torch
@@ -25,27 +26,10 @@ def create_onnx_dummy_input():
         "x_dict": hetero_data.x_dict,
         "edge_index_dict": hetero_data.edge_index_dict,
         "edge_attr_dict": hetero_data.edge_attr_dict,
-    }
-
-
-def create_onnxruntime_dummy_input():
-    hetero_data = create_dummy_hetero_data()
-
-    return {
-        "game_vertex": hetero_data.x_dict["game_vertex"],
-        "state_vertex": hetero_data.x_dict["state_vertex"],
-        "gv2gv": hetero_data.edge_index_dict[("game_vertex", "to", "game_vertex")],
-        "sv_in_gv": hetero_data.edge_index_dict[("state_vertex", "in", "game_vertex")],
-        "gv_in_sv": hetero_data.edge_index_dict[("game_vertex", "in", "state_vertex")],
-        "sv_his_gv": hetero_data.edge_index_dict[
-            ("state_vertex", "history", "game_vertex")
-        ],
-        "gv_his_sv": hetero_data.edge_index_dict[
-            ("game_vertex", "history", "state_vertex")
-        ],
-        "sv_parentof_sv": hetero_data.edge_index_dict[
-            ("state_vertex", "parent_of", "state_vertex")
-        ],
+        # "edge_index": np.array([1, 2]),
+        # "edge_index.5": np.array([1, 2]),
+        # "edge_index.3": np.array([1, 2]),
+        # "onnx::Reshape_9": np.array([1, 2]),
     }
 
 
@@ -54,15 +38,16 @@ def create_torch_dummy_input():
     return hetero_data.x_dict, hetero_data.edge_index_dict, hetero_data.edge_attr_dict
 
 
-def export_onnx_model(model: torch.nn.Module, save_path: str):
+def export_onnx_model(model: torch.nn.Module, save_path: str, opset_ver: int = None):
     torch.onnx.export(
         model=model,
         args=(*create_torch_dummy_input(), {}),
         f=save_path,
         verbose=False,
-        export_params=True,
+        do_constant_folding=True,
         input_names=["x_dict", "edge_index_dict", "edge_attr_dict"],
-        opset_version=16,
+        output_names=["out"],
+        opset_version=opset_ver,
     )
 
     torch_model_out = model(*create_torch_dummy_input())
@@ -74,10 +59,10 @@ def check_onnx_model(path: str, check_against):
     onnx.checker.check_model(model)
     print(onnx.helper.printable_graph(model.graph))
 
-    # ort_session = onnxruntime.InferenceSession(path)
-    # ort_inputs = create_onnxruntime_dummy_input()
-    # ort_outs = ort_session.run(None, ort_inputs)
+    ort_session = onnxruntime.InferenceSession(path)
+    ort_inputs = create_onnx_dummy_input()
+    ort_outs = ort_session.run(None, ort_inputs)
 
-    # print(ort_outs == check_against)
+    print(ort_outs == check_against)
 
     print("ONNX model loaded succesfully")
