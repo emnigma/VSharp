@@ -220,12 +220,12 @@ def convert_input_to_tensor(input: GameState) -> Tuple[HeteroData, Dict[int, int
 class StateGNNEncoderConvEdgeAttrMod(torch.nn.Module):
     def __init__(self, hidden_channels, out_channels):
         super().__init__()
-        self.conv1 = TAGConv(5, hidden_channels, 2)
-        self.conv2 = TAGConv(6, hidden_channels, 3)  # TAGConv
-        self.conv3 = GraphConv((-1, -1), hidden_channels)  # SAGEConv
-        self.conv32 = GraphConv((-1, -1), hidden_channels)
-        self.conv4 = SAGEConv((-1, -1), hidden_channels)
-        self.conv42 = SAGEConv((-1, -1), hidden_channels)
+        self.conv1 = TAGConv(5, hidden_channels, 2).jittable()
+        self.conv2 = TAGConv(6, hidden_channels, 3).jittable()  # TAGConv
+        self.conv3 = GraphConv((-1, -1), hidden_channels).jittable()  # SAGEConv
+        self.conv32 = GraphConv((-1, -1), hidden_channels).jittable()
+        self.conv4 = SAGEConv((-1, -1), hidden_channels).jittable()
+        self.conv42 = SAGEConv((-1, -1), hidden_channels).jittable()
         self.lin = Linear(hidden_channels, out_channels)
         self.lin_last = Linear(out_channels, 1)
 
@@ -311,6 +311,7 @@ DUMMY_PATH = "ml/onnx/dummy_input.json"
 def main():
     model = StateModelEncoderExport(hidden_channels=32, out_channels=8)
     model.forward(*create_torch_dummy_input(DUMMY_PATH))
+    model = torch.jit.script(model)
     model.eval()
 
     save_path = "test_model.onnx"
