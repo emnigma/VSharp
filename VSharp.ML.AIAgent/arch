@@ -1,0 +1,47 @@
+TORCH_SCRIPT
+graph(%self.1 : __torch__.ml.model_modified.StateModelEncoderExport,
+      %124 : Dict(str, Tensor),
+      %129 : Dict(str, Tensor),
+      %142 : Dict(str, Tensor)):
+  %state_encoder : __torch__.ml.model_modified.StateGNNEncoderConvEdgeAttrExport = prim::GetAttr[name="state_encoder"](%self.1)
+  %125 : str = prim::Constant[value="game_vertex"]()
+  %x.1 : Tensor = aten::__getitem__(%124, %125) # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %127 : str = prim::Constant[value="state_vertex"]()
+  %x.7 : Tensor = aten::__getitem__(%124, %127) # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %130 : str = prim::Constant[value="game_vertex to game_vertex"]()
+  %edge_index.1 : Tensor = aten::__getitem__(%129, %130) # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %134 : str = prim::Constant[value="game_vertex in state_vertex"]()
+  %edge_index : Tensor = aten::__getitem__(%129, %134) # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %138 : str = prim::Constant[value="game_vertex history state_vertex"]()
+  %edge_index.5 : Tensor = aten::__getitem__(%129, %138) # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %140 : str = prim::Constant[value="state_vertex parent_of state_vertex"]()
+  %edge_index.3 : Tensor = aten::__getitem__(%129, %140) # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %145 : str = prim::Constant[value="game_vertex history state_vertex"]()
+  %edge_weight : Tensor = aten::__getitem__(%142, %145) # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %881 : Tensor = prim::CallMethod[name="forward"](%state_encoder, %x.1, %edge_index.1, %x.7, %edge_index.3, %edge_index.5, %edge_weight, %edge_index)
+  %760 : str = prim::Constant[value="state_vertex"]() # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %761 : str = prim::Constant[value="game_vertex"]() # /Users/emax/miniconda3/envs/nmax/lib/python3.11/site-packages/torch/jit/_trace.py:1056:0
+  %762 : Dict(str, Tensor) = prim::DictConstruct(%760, %881, %761, %x.1)
+  return (%762)
+
+
+PYTHON-LIKE_CODE:
+def forward(self,
+    argument_1: Dict[str, Tensor],
+    argument_2: Dict[str, Tensor],
+    argument_3: Dict[str, Tensor]) -> Dict[str, Tensor]:
+  state_encoder = self.state_encoder
+  x = argument_1["game_vertex"]
+  x0 = argument_1["state_vertex"]
+  edge_index = argument_2["game_vertex to game_vertex"]
+  edge_index0 = argument_2["game_vertex in state_vertex"]          # edge_index
+  edge_index1 = argument_2["game_vertex history state_vertex"]
+  edge_index2 = argument_2["state_vertex parent_of state_vertex"]  # edge_index.3
+  edge_weight = argument_3["game_vertex history state_vertex"]     # edge_index.5
+  _0 = (state_encoder).forward(x, edge_index, x0, edge_index2, edge_index1, edge_weight, edge_index0, )
+  _1 = {"state_vertex": _0, "game_vertex": x}
+  return _1
+
+([x,         edge_index,        x0,               edge_index2,                    edge_index1,                            edge_weight,                             edge_index0])
+(['x_dict', 'edge_index_dict', 'edge_attr_dict', 'edge_index',                   'edge_index.5',                         'edge_index.3',                          'onnx::Reshape_9'])
+([ x_dict,   edge_index_dict,  edge_attr_dict,  "game_vertex in state_vertex",  "game_vertex history state_vertex",     "state_vertex parent_of state_vertex",    ...])

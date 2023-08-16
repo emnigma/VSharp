@@ -1,6 +1,5 @@
 import json
 
-import numpy as np
 import onnx
 import onnxruntime
 import torch
@@ -39,6 +38,7 @@ def create_torch_dummy_input():
 
 
 def export_onnx_model(model: torch.nn.Module, save_path: str, opset_ver: int = None):
+    model = torch.jit.script(model)
     torch.onnx.export(
         model=model,
         args=(*create_torch_dummy_input(), {}),

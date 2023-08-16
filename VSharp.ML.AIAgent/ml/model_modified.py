@@ -23,7 +23,6 @@ class StateModelEncoderExport(torch.nn.Module):
             hidden_channels, out_channels
         )
 
-    @timeit
     def forward(self, x_dict, edge_index_dict, edge_attr=None):
         z_dict = {}
         z_dict["state_vertex"] = self.state_encoder(x_dict, edge_index_dict, edge_attr)
