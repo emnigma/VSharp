@@ -72,7 +72,7 @@ class FeatureConfig:
     VERBOSE_TABLES = True
     SHOW_SUCCESSORS = True
     NAME_LEN = 7
-    DISABLE_MESSAGE_CHECKS = True
+    DISABLE_MESSAGE_CHECKS = False
     DUMP_BY_TIMEOUT = DumpByTimeoutFeature(
         enabled=True, timeout_sec=1800, save_path=Path("./report/timeouted_agents/")
     )

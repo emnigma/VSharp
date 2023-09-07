@@ -117,63 +117,39 @@ class StateModelEncoder(torch.nn.Module):
         final_tensor[row_start : row_start + 2, :state_to_state_n] = edge_index_dict[
             "state_vertex parent_of state_vertex"
         ]
+        final_tensor.transpose(0, 1)
+
         return final_tensor
 
-    def forward(self, x):
-        game_x = x[
-            self.sizes_dict["game_vertex"][0] : self.sizes_dict["game_vertex"][1],
-            : self.vertices_n,
-        ].transpose(0, 1)
-        start = self.sizes_dict["game_vertex to game_vertex"][0]
-        vertex_to_vertex = x[
-            start : start + 2, : self.sizes_dict["game_vertex to game_vertex"][1]
-        ].to(torch.int64)
-
+    def forward(
+        self,
+        game_x,
+        state_x,
+        edge_index_v_v,
+        edge_index_history_v_s,
+        edge_attr_history_v_s,
+        edge_index_in_v_s,
+        edge_index_s_s,
+    ):
         game_x = self.conv1(
             game_x,
-            vertex_to_vertex,
+            edge_index_v_v,
         ).relu()
-
-        start = self.sizes_dict["state_vertex"][0]
-
-        state_x = x[
-            start : start + self.sizes_dict["state_vertex"][1], : self.states_n
-        ].transpose(0, 1)
-
-        start = self.sizes_dict["game_vertex history state_vertex"][0]
-        history_index = x[
-            start : start + 2, : self.sizes_dict["game_vertex history state_vertex"][1]
-        ].to(torch.int64)
-        start += 2
-        history_attr = x[
-            start : start + 1,
-            : self.sizes_dict["attr game_vertex history state_vertex"][1],
-        ].transpose(0, 1)
 
         state_x = self.conv3(
             (game_x, state_x),
-            history_index,
-            history_attr,
+            edge_index_history_v_s,
+            edge_attr_history_v_s,
         ).relu()
-
-        start = self.sizes_dict["game_vertex in state_vertex"][0]
-        in_index = x[
-            start : start + 2, : self.sizes_dict["game_vertex in state_vertex"][1]
-        ].to(torch.int64)
 
         state_x = self.conv4(
             (game_x, state_x),
-            in_index,
+            edge_index_in_v_s,
         ).relu()
-
-        state_edges_n = self.sizes_dict["state_vertex parent_of state_vertex"][1]
-        # if state_edges_n != 0: is it needed here?
-        start = self.sizes_dict["state_vertex parent_of state_vertex"][0]
-        parent_index = x[start : start + 2, :state_edges_n].to(torch.int64)
 
         state_x = self.conv2(
             state_x,
-            parent_index,
+            edge_index_s_s,
         ).relu()
 
         return self.lin(state_x)
