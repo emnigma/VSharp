@@ -6,6 +6,7 @@ from typing import Any, Callable, OrderedDict
 import onnx
 import onnxruntime
 import torch
+from torch_geometric.data import HeteroData
 
 from common.game import GameState
 from ml.data_loader_compact import ServerDataloaderHeteroVector
@@ -16,7 +17,7 @@ DUMMY_PATH = "ml/onnx/dummy_input.json"
 
 GAME_VERTEX = "game_vertex"  # game_x
 STATE_VERTEX = "state_vertex"  # state_x
-GV_TO_SV = "game_vertex to game_vertex"  # edge_index_v_v
+GV_TO_GV = "game_vertex to game_vertex"  # edge_index_v_v
 GV_HIS_SV = "game_vertex history state_vertex"
 GV_HIS_SV_INDEX = GV_HIS_SV + " index"  # edge_index_history_v_s
 GV_HIS_SV_ATTRS = GV_HIS_SV + " attrs"  # edge_attr_history_v_s
@@ -33,25 +34,13 @@ def load_hetero_data(path):
     return hetero_data
 
 
-def split_data(data, with_modifier: Callable[[Any], Any] = lambda x: x):
-    return (
-        with_modifier(data[GAME_VERTEX].x),
-        with_modifier(data[STATE_VERTEX].x),
-        with_modifier(data[GV_TO_SV].edge_index),
-        with_modifier(data[GV_HIS_SV].edge_index),
-        with_modifier(data[GV_HIS_SV].edge_attr),
-        with_modifier(data[GV_IN_SV].edge_index),
-        with_modifier(data[SV_PARENTOF_SV].edge_index),
-    )
-
-
-def hetero_data_to_onnx_in(
-    data, with_modifier: Callable[[Any], Any] = lambda x: x.numpy()
+def convert_to_dict(
+    data: HeteroData, with_modifier: Callable[[Any], Any] = lambda x: x.numpy()
 ):
     return {
         GAME_VERTEX: with_modifier(data[GAME_VERTEX].x),
         STATE_VERTEX: with_modifier(data[STATE_VERTEX].x),
-        GV_TO_SV: with_modifier(data[GV_TO_SV].edge_index),
+        GV_TO_GV: with_modifier(data[GV_TO_GV].edge_index),
         GV_HIS_SV_INDEX: with_modifier(data[GV_HIS_SV].edge_index),
         GV_HIS_SV_ATTRS: with_modifier(data[GV_HIS_SV].edge_attr),
         GV_IN_SV: with_modifier(data[GV_IN_SV].edge_index),
@@ -59,7 +48,12 @@ def hetero_data_to_onnx_in(
     }
 
 
+def convert_to_seq(data: HeteroData, with_modifier: Callable[[Any], Any] = lambda x: x):
+    return tuple(convert_to_dict(data, with_modifier).values())
+
+
 def main():
+    # torch.set_grad_enabled(False)
     test_folder = pathlib.Path("./test_game_states")
     onnx_model_save_path = "test_model.onnx"
 
@@ -78,8 +72,7 @@ def main():
 
     model.load_state_dict(strange_sd)
 
-    # x = model.convert_to_single_tensor(*create_dummy_hetero_data(), False)
-    model_input = split_data(create_dummy_hetero_data())
+    model_input = convert_to_seq(create_dummy_hetero_data())
 
     torch_out = model.forward(*model_input)
     # traced_cell = torch.jit.trace(model, x, strict=False)
@@ -96,7 +89,7 @@ def main():
         dynamic_axes={
             GAME_VERTEX: {0: "gv_count"},
             STATE_VERTEX: {0: "sv_count"},
-            GV_TO_SV: {1: "gv2gv_rel_count"},
+            GV_TO_GV: {1: "gv2gv_rel_count"},
             GV_HIS_SV_INDEX: {1: "gv_his_sv_index_rel_count"},
             GV_HIS_SV_ATTRS: {0: "gv_his_sv_attrs_count"},
             GV_IN_SV: {1: "gv_in_sv_rel_count"},
@@ -104,41 +97,44 @@ def main():
             # "out": [0, 1, 2, 3, 4, 5, 6, 7],
             # "out": [0],
         },
-        do_constant_folding=False,
         input_names=[
             GAME_VERTEX,
             STATE_VERTEX,
-            GV_TO_SV,
+            GV_TO_GV,
             GV_HIS_SV_INDEX,
             GV_HIS_SV_ATTRS,
             GV_IN_SV,
             SV_PARENTOF_SV,
         ],
         output_names=["out"],
-        export_params=True,
+        # export_modules_as_functions=True,
+        opset_version=17,
     )
 
     model_onnx = onnx.load(onnx_model_save_path)
     onnx.checker.check_model(model_onnx)
-    print(onnx.helper.printable_graph(model_onnx.graph))
+    # print(onnx.helper.printable_graph(model_onnx.graph))
 
-    ort_in = hetero_data_to_onnx_in(create_dummy_hetero_data())
+    ort_in = convert_to_dict(create_dummy_hetero_data())
     ort_session = onnxruntime.InferenceSession(onnx_model_save_path)
     ort_outs = ort_session.run(None, ort_in)
 
     print(f"{shorten_output(torch_out)=}")
     print(f"{shorten_output(ort_outs[0])=}")
 
-    for idx, test_gs in enumerate(os.listdir(test_folder)[:4]):
+    for idx, test_gs in enumerate(os.listdir(test_folder)):
         x = load_hetero_data(test_folder / test_gs)
-        torch_out = model(*split_data(x))
 
-        ort_in = hetero_data_to_onnx_in(x)
+        torch_out = model(*convert_to_seq(x))
+
+        ort_in = convert_to_dict(x)
         ort_outs = ort_session.run(None, ort_in)
 
         print(f"{shorten_output(torch_out)=}")
         print(f"{shorten_output(ort_outs[0])=}")
         print(f"{idx}/{len(os.listdir(test_folder))}")
+
+        assert shorten_output(torch_out) == shorten_output(ort_outs[0])
 
 
 def shorten_output(torch_out):
