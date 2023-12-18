@@ -203,7 +203,6 @@ type private SVMExplorer(explorationOptions: ExplorationOptions, statistics: SVM
                 None
         method.Parameters |> Array.map allocateIfByRef |> Array.toList
 
-
     member private x.FormIsolatedInitialStates (method : Method, initialState : state) =
         try
             initialState.model <- Memory.EmptyModel method
@@ -410,7 +409,6 @@ type private SVMExplorer(explorationOptions: ExplorationOptions, statistics: SVM
 
     member private x.Stop() = isStopped <- true
 
-
 type private FuzzerExplorer(explorationOptions: ExplorationOptions, statistics: SVMStatistics) =
 
     interface IExplorer with
@@ -438,7 +436,6 @@ type private FuzzerExplorer(explorationOptions: ExplorationOptions, statistics: 
                     do! interactor.StartFuzzing ()
                 with e -> Logger.error $"Fuzzer unhandled exception: {e.Message}"
             }
-
 
 type public Explorer(options : ExplorationOptions, reporter: IReporter) =
 
