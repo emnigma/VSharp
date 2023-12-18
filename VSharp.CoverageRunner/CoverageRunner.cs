@@ -152,17 +152,17 @@ namespace VSharp.CoverageRunner
             return (int)Math.Floor(100 * ((double)coveredSize / cfg.MethodSize));
         }
 
-        public static int RunAndGetCoverage(string args, DirectoryInfo workingDirectory, MethodBase methodInfo)
+        public static int RunAndGetCoverage(string args, DirectoryInfo workingDirectory, MethodBase methodBase)
         {
             // TODO: delete non-main methods from serialization
-            var success = StartCoverageTool(args, workingDirectory, methodInfo);
+            var success = StartCoverageTool(args, workingDirectory, methodBase);
             if (!success)
             {
                 Logger.printLogString(Logger.Error, "TestRunner with Coverage failed to run!");
                 return -1;
             }
 
-            var method = Application.getMethod(methodInfo);
+            var method = Application.getMethod(methodBase);
 
             if (!method.HasBody)
             {
@@ -177,7 +177,7 @@ namespace VSharp.CoverageRunner
                 Logger.printLogString(Logger.Error, "CoverageRunner could not deserialize coverage history");
                 return -1;
             }
-            return ComputeCoverage(method.CFG, reports, methodInfo);
+            return ComputeCoverage(method.CFG, reports, methodBase);
         }
     }
 }
