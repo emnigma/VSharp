@@ -13,7 +13,7 @@ namespace VSharp.Runner
     public static class RunnerProgram
     {
 
-        public static Assembly? TryLoadAssembly(FileInfo assemblyPath)
+        private static Assembly? TryLoadAssembly(FileInfo assemblyPath)
         {
             try
             {
@@ -25,99 +25,6 @@ namespace VSharp.Runner
                 Console.Error.WriteLine(ex.StackTrace);
                 return null;
             }
-        }
-
-        public static Type? ResolveType(Assembly assembly, string? classArgumentValue)
-        {
-            if (classArgumentValue == null)
-            {
-                Console.Error.WriteLine("Specified class can not be null");
-                return null;
-            }
-
-            var specificClass =
-                assembly.GetType(classArgumentValue) ??
-                assembly.GetTypes()
-                    .Where(t => (t.FullName ?? t.Name).Contains(classArgumentValue))
-                    .MinBy(t => t.FullName?.Length ?? t.Name.Length);
-            if (specificClass == null)
-            {
-                Console.Error.WriteLine("I did not found type you specified {0} in assembly {1}", classArgumentValue,
-                    assembly.Location);
-                return null;
-            }
-
-            return specificClass;
-        }
-
-        public static MethodBase? ResolveMethod(Assembly assembly, string? methodArgumentValue)
-        {
-            if (methodArgumentValue == null)
-            {
-                Console.Error.WriteLine("Specified method can not be null");
-                return null;
-            }
-
-            MethodBase? method = null;
-            if (Int32.TryParse(methodArgumentValue, out var metadataToken))
-            {
-                foreach (var module in assembly.GetModules())
-                {
-                    try
-                    {
-                        method = module.ResolveMethod(metadataToken);
-                        if (method != null) break;
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                }
-
-                if (method == null)
-                {
-                    Console.Error.WriteLine("I did not found method you specified by token {0} in assembly {1}",
-                        metadataToken, assembly.Location);
-                    return null;
-                }
-            }
-            else
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    try
-                    {
-                        var t = methodArgumentValue.Split('.');
-                        var className = t.Length == 1 ? "" : t[t.Length - 2];
-                        var methodName = t.Last(); 
-                        //method = type.GetMethod(t.Last(), Reflection.allBindingFlags);
-                        //method = type.GetMethod(methodArgumentValue, Reflection.allBindingFlags);
-                        var x = type.GetMethods(Reflection.allBindingFlags);
-                        foreach (var m in x)
-                        {
-                           // Console.WriteLine($"{type.FullName}.{m.Name}");
-                        }
-                        method ??= x
-                            .Where(m => type.FullName.Split('.').Last().Contains(className) && m.Name.Contains(methodName))
-                            .MinBy(m => m.Name.Length);
-                        if (method != null) 
-                            break;
-                    }
-                    catch (Exception)
-                    {
-                        // ignored
-                    }
-                }
-
-                if (method == null)
-                {
-                    Console.Error.WriteLine("I did not found method you specified by name {0} in assembly {1}",
-                        methodArgumentValue, assembly.Location);
-                    return null;
-                }
-            }
-
-            return method;
         }
 
         private static void PostProcess(Statistics statistics)
