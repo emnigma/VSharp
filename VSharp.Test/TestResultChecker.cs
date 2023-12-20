@@ -34,16 +34,15 @@ public static class TestResultChecker
         out string resultMessage)
     {
         var runnerWithArgs = $"{TestRunnerPath} {testDir.FullName}";
-        var coverage = RunAndGetCoverage(runnerWithArgs, testDir, methodInfo);
-        actualCoverage = coverage;
+        actualCoverage = RunAndGetCoverage(runnerWithArgs, testDir, methodInfo);
         resultMessage = string.Empty;
 
-        if (expectedCoverage == coverage)
+        if (expectedCoverage == actualCoverage)
         {
             return true;
         }
 
-        resultMessage = $"Incomplete coverage! Expected {expectedCoverage}, but got {coverage}";
+        resultMessage = $"Incomplete coverage! Expected {expectedCoverage}, but got {actualCoverage}";
         return false;
     }
 }
