@@ -150,6 +150,7 @@ namespace VSharp.Runner
             string methodName,
             int timeout,
             int solverTimeout,
+            uint stepsLimit,
             DirectoryInfo output,
             bool renderTests,
             bool runTests,
@@ -194,7 +195,8 @@ namespace VSharp.Runner
                     searchStrategy: strat,
                     verbosity: verbosity,
                     recursionThreshold: recursionThreshold,
-                    explorationMode: explorationMode);
+                    explorationMode: explorationMode,
+                    stepsLimit: stepsLimit);
 
             Statistics statistics;
             if (runTests || checkCoverage)
@@ -260,6 +262,10 @@ namespace VSharp.Runner
                 aliases: new[] { "--solver-timeout", "-st" },
                 () => -1,
                 "Timeout for SMT solver in seconds. Negative value means no timeout.");
+            var stepsLimitOption = new Option<uint>(
+                aliases: new[] { "--steps-limit", "-sl" },
+                () => 0,
+                "Steps limit for solver. Zero value means no limit.");
             var outputOption = new Option<DirectoryInfo>(
                 aliases: new[] { "--output", "-o" },
                 () => new DirectoryInfo(Directory.GetCurrentDirectory()),
@@ -294,6 +300,7 @@ namespace VSharp.Runner
             var rootCommand = new RootCommand("Symbolic execution engine for .NET");
             rootCommand.AddGlobalOption(timeoutOption);
             rootCommand.AddGlobalOption(solverTimeoutOption);
+            rootCommand.AddGlobalOption(stepsLimitOption);
             rootCommand.AddGlobalOption(outputOption);
             rootCommand.AddGlobalOption(renderTestsOption);
             rootCommand.AddGlobalOption(runTestsOption);
@@ -404,6 +411,7 @@ namespace VSharp.Runner
                     parseResult.GetValueForArgument(methodArgument),
                     parseResult.GetValueForOption(timeoutOption),
                     parseResult.GetValueForOption(solverTimeoutOption),
+                    parseResult.GetValueForOption(stepsLimitOption),
                     output,
                     parseResult.GetValueForOption(renderTestsOption),
                     parseResult.GetValueForOption(runTestsOption),

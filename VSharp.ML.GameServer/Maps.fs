@@ -15,65 +15,65 @@ let trainMaps, validationMaps =
     
     let add = add' trainMaps 10000000u<step>
    
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "BinarySearch"    
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "BinarySearch"    
     add 50u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "BinarySearch"
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches1"    
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches1"    
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches2"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches2"
     //debug me//add 15u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches2"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches3"
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches4"
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches5"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches3"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches4"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "Switches5"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "NestedFors"    
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "NestedFors"    
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "SearchKMP"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "SearchKMP"
     add 20u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "SearchKMP"
    
-    //add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "SearchWords"
+    //add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "SearchWords"
     //add 10u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "SearchWords"
       
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "BellmanFord"    
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "BellmanFord"    
     add 60u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "BellmanFord"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "bsPartition"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "bsPartition"
     add 20u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "bsPartition"
     add 70u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "bsPartition"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "matrixInverse"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "matrixInverse"
     add 25u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "matrixInverse"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "determinant"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "determinant"
     add 50u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "determinant"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "getCofactor"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "getCofactor"
     add 50u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "getCofactor"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "fillRemaining"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "fillRemaining"
     add 20u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "fillRemaining"
     add 40u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "fillRemaining"   
     
-    //add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "solveWordWrap"
+    //add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "solveWordWrap"
     //add 20u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "solveWordWrap"
     //add 80u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "solveWordWrap"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "waysToIncreaseLCSBy1"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "waysToIncreaseLCSBy1"
     //add 30u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "waysToIncreaseLCSBy1"
     //add 70u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "waysToIncreaseLCSBy1"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "BinaryMaze1BFS"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "BinaryMaze1BFS"
     add 30u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "BinaryMaze1BFS"
     add 70u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "BinaryMaze1BFS"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "findShortestPathLength"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "findShortestPathLength"
     add 30u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "findShortestPathLength"
     add 80u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "findShortestPathLength"
    
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "countIslands"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "countIslands"
     add 30u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "countIslands"
     
-    add 0u<percent>  "VSharp.ML.GameMaps.dll" CoverageZone.Method "MatrixQueryModifyMatrix"
+    add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "MatrixQueryModifyMatrix"
     add 50u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "MatrixQueryModifyMatrix"
     
     add 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "RedBlackTreeInsert"
@@ -142,18 +142,6 @@ let trainMaps, validationMaps =
     add 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "BpTree.Delete"
     
     
-    (*
-    add 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "OpenAddressHashSet.Contains"
-    add 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "OpenAddressHashSet.Add"
-    add 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "OpenAddressHashSet.Remove"
-    
-    add 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "BloomFilter.AddKey"
-    add 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "BloomFilter.KeyExists"
-    
-    add 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "DisJointSet.Union"
-    add 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "DisJointSet.FindSet"
-    *)
-    
     //+add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "CPU.EstimateCPUSpeedFromName"
     //add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "CPU.GetMemoryMap"
     //add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "CPU.GetLargestMemoryBlock"
@@ -171,13 +159,7 @@ let trainMaps, validationMaps =
     //add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "Heap.Collect"
     //add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "Heap.MarkAndSweepObject"
     //add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "Heap.SweepTypedObject"
-    (*
-    add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "Multiboot2.Init"
-    
-    add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "VTablesImpl.IsInstance"
-    add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "VTablesImpl.SetTypeInfo"
-    add 0u<percent> "Cosmos.Core.dll" CoverageZone.Method "VTablesImpl.GetMethodAddressForType"
-    *)
+
     add 0u<percent> "JetBrains.Lifetimes.dll" CoverageZone.Method "CompactList.LastIndexOf"
     add 0u<percent> "JetBrains.Lifetimes.dll" CoverageZone.Method "CompactList.Add"
     add 0u<percent> "JetBrains.Lifetimes.dll" CoverageZone.Method "CompactList.ToArray"
@@ -337,24 +319,24 @@ let trainMaps, validationMaps =
     //add 0u<percent> "Algorithms.dll" CoverageZone.Method "BellmanFordShortestPaths.ShortestPathTo"
     
     
-    //add 0u  "VSharp.ML.GameMaps.dll" CoverageZone.Method "KruskalMST"
+    //add 0u "VSharp.ML.GameMaps.dll" CoverageZone.Method "KruskalMST"
     //add 20u "VSharp.ML.GameMaps.dll" CoverageZone.Method "KruskalMST"
     //add 40u "VSharp.ML.GameMaps.dll" CoverageZone.Method "KruskalMST"
     //add 60u "VSharp.ML.GameMaps.dll" CoverageZone.Method "KruskalMST"
 
     let add = add' validationMaps
         
-    //!!!add 1000u<step>  0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "mergeSort"
+    //add 1000u<step>  0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "mergeSort"
     //add 20000u<step> 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "LoanExamBuild"    
     //add 10000u<step>  0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "multiply_matrix"    
     //add 10000u<step>  0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "adjoint"
     add 5000u<step> 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "LoanExamBuild"    
-    add 5000u<step>  0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "multiply_matrix"    
-    add 5000u<step>  0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "adjoint"
+    add 5000u<step> 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "multiply_matrix"    
+    add 5000u<step> 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "adjoint"
     add 1000u<step> 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "bridge"
-    add 1000u<step>  0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "PrimeFactorCount"    
+    add 1000u<step> 0u<percent> "VSharp.ML.GameMaps.dll" CoverageZone.Method "PrimeFactorCount"    
     //add 10000u<step> 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "FindLongestPalindrome"
-    add 5000u<step>  0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "bucketSort"
+    add 5000u<step> 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "bucketSort"
     //add 15000u<step> 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "GetMaxBiPartiteMatchingMain"
     add 5000u<step> 0u<percent> "Advanced.Algorithms.dll" CoverageZone.Method "GetMaxBiPartiteMatchingMain"
     add 5000u<step> 0u<percent> "JetBrains.Lifetimes.dll" CoverageZone.Method "ReactiveEx.AdviseUntil"

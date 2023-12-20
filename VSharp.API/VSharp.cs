@@ -98,6 +98,7 @@ namespace VSharp
             writer.WriteLine($"Test results written to {OutputDir.FullName}");
             writer.WriteLine($"Tests generated: {TestsCount}");
             writer.WriteLine($"Errors generated: {ErrorsCount}");
+            writer.WriteLine($"Steps: {StepsCount}");
         }
 
         /// <summary>
