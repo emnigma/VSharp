@@ -61,6 +61,7 @@ type InputMessage =
 type StateHistoryElem =
     val GraphVertexId: uint<basicBlockGlobalId>
     val NumOfVisits: uint
+    [<JsonConstructor>]
     new (graphVertexId, numOfVisits) =
         {
             GraphVertexId = graphVertexId
@@ -79,7 +80,8 @@ type State =
     val VisitedNotCoveredVerticesInZone: uint
     val VisitedNotCoveredVerticesOutOfZone: uint
     val History: array<StateHistoryElem>
-    val Children: array<uint<stateId>> 
+    val Children: array<uint<stateId>>
+    [<JsonConstructor>]
     new(id,
         position,
         predictedUsefulness,
@@ -111,6 +113,7 @@ type GameMapVertex =
     val VisitedByState: bool
     val TouchedByState: bool
     val States: uint<stateId>[]
+    [<JsonConstructor>]
     new (uid,
          id,
          inCoverageZone,
@@ -133,6 +136,7 @@ type GameMapVertex =
 [<Struct>]
 type GameEdgeLabel =
     val Token: int
+    [<JsonConstructor>]
     new (token) = {Token = token}
 
 [<Struct>]
@@ -140,6 +144,7 @@ type GameMapEdge =
     val VertexFrom: uint<basicBlockGlobalId>
     val VertexTo: uint<basicBlockGlobalId>
     val Label: GameEdgeLabel
+    [<JsonConstructor>]
     new (vFrom, vTo, label) = {VertexFrom = vFrom; VertexTo = vTo; Label = label}
     
 [<Struct>]
@@ -148,6 +153,7 @@ type GameState =
     val GraphVertices: GameMapVertex[]
     val States: State[]
     val Map: GameMapEdge[]
+    [<JsonConstructor>]
     new (graphVertices, states, map) = {GraphVertices = graphVertices; States = states; Map = map}
     
 type [<Measure>] coverageReward

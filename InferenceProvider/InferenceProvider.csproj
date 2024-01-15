@@ -12,4 +12,8 @@
       <PackageReference Include="System.Numerics.Tensors" Version="8.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\VSharp.ML.GameServer\VSharp.ML.GameServer.fsproj" />
+    </ItemGroup>
+
 </Project>
