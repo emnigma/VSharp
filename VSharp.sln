@@ -62,6 +62,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BizHawk.BizInvoke", "BizHaw
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Virtu", "BizHawk\ExternalCoreProjects\Virtu\Virtu.csproj", "{87628F42-54BF-4C87-8269-F549DEA1CC41}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InferenceProvider", "InferenceProvider\InferenceProvider.csproj", "{942B5961-3FCA-4E53-B807-E91F892649F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -255,6 +257,12 @@ Global
 		{87628F42-54BF-4C87-8269-F549DEA1CC41}.Release|Any CPU.Build.0 = Release|Any CPU
 		{87628F42-54BF-4C87-8269-F549DEA1CC41}.DebugTailRec|Any CPU.ActiveCfg = Debug|Any CPU
 		{87628F42-54BF-4C87-8269-F549DEA1CC41}.DebugTailRec|Any CPU.Build.0 = Debug|Any CPU
+		{942B5961-3FCA-4E53-B807-E91F892649F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{942B5961-3FCA-4E53-B807-E91F892649F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{942B5961-3FCA-4E53-B807-E91F892649F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{942B5961-3FCA-4E53-B807-E91F892649F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{942B5961-3FCA-4E53-B807-E91F892649F5}.DebugTailRec|Any CPU.ActiveCfg = Debug|Any CPU
+		{942B5961-3FCA-4E53-B807-E91F892649F5}.DebugTailRec|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{34E59F4B-213A-401D-9DCA-A1AA4BBFA536} = {BE43DB14-A4D5-492C-B459-369A1DAC1FC1}

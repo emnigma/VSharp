@@ -1,0 +1,15 @@
+pytorch1.13.1:ç
+B
+input
+onnx::MatMul_6/lin/MatMul_output_0/lin/MatMul"MatMul
+7
+lin.bias
+/lin/MatMul_output_0output/lin/Add"Add	torch_jit*Blin.biasJş«T¿*Bonnx::MatMul_6JˆAI>Z
+input
+
+
+b
+output
+
+
+B
