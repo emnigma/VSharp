@@ -6,7 +6,7 @@ import numpy as np
 class NeuralNetwork(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.lin = torch.nn.Linear(1, 1)
+        self.lin = torch.nn.Linear(4, 4)
 
     def forward(self, x):
         return self.lin(x)
@@ -15,7 +15,7 @@ class NeuralNetwork(torch.nn.Module):
 def main():
     model = NeuralNetwork()
     model_path = "/Users/emax/Data/VSharp/InferenceProvider/test_nn.onnx"
-    test_in = torch.Tensor([1])
+    test_in = torch.Tensor([[0, 1, 2, 3], [0, 1, 2, 3]])
 
     print(model)
     print(model(test_in))

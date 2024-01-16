@@ -1,3 +1,4 @@
+using Algorithms.Common;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using Microsoft.VisualBasic.CompilerServices;
@@ -180,7 +181,15 @@ namespace InferenceProvider
             return OrtValue.CreateTensorValueFromMemory(sourceData, dimensions);
         }
 
-        public static int Infer(NativeInput nativeInput)
+        private static uint predictState(List<List<float>> ranks, Dictionary<uint, uint> stateMap)
+        {
+            var reverseMap = stateMap.ToDictionary(x => x.Value, x => x.Key);
+            var (_, index) = ranks.Select((n, i) => (n.Sum(), i)).Max();
+
+            return reverseMap[Convert.ToUInt32(index)];
+        }
+
+        public static uint Infer(NativeInput nativeInput)
         {
             var input = new Dictionary<string, OrtValue>
             {
@@ -211,18 +220,14 @@ namespace InferenceProvider
             using var runOptions = new RunOptions();
             var output = session.Run(runOptions, input, session.OutputNames);
             var outputData = output[0].GetTensorDataAsSpan<float>();
-            var tensorTypeAndShape = output[0].GetTensorTypeAndShape();
 
-            Console.WriteLine(tensorTypeAndShape.ElementDataType);
-            Console.WriteLine(outputData.Length);
-            Console.WriteLine(outputData.ToArray());
+            var ranks = outputData.ToArray()
+                .Select((n, i) => new { Value = n, Index = i })
+                .GroupBy(x => x.Index / 8)
+                .Select(grp => grp.Select(X => X.Value).ToList())
+                .ToList();
 
-            foreach (var outValue in outputData)
-            {
-                Console.WriteLine(outValue);
-            }
-
-            return 0;
+            return predictState(ranks, nativeInput.stateMap);
         }
 
         public static void Main(string[] args)

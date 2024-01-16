@@ -153,7 +153,7 @@ type GameState =
     val GraphVertices: GameMapVertex[]
     val States: State[]
     val Map: GameMapEdge[]
-    [<JsonConstructor>]
+    // [<JsonConstructor>]
     new (graphVertices, states, map) = {GraphVertices = graphVertices; States = states; Map = map}
     
 type [<Measure>] coverageReward
