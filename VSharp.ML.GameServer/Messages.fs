@@ -82,25 +82,25 @@ type State =
     val History: array<StateHistoryElem>
     val Children: array<uint<stateId>>
     [<JsonConstructor>]
-    new(id,
-        position,
-        predictedUsefulness,
-        pathConditionSize,
-        visitedAgainVertices,
-        visitedNotCoveredVerticesInZone,
-        visitedNotCoveredVerticesOutOfZone,
-        history,
-        children) =
+    new(Id,
+        Position,
+        PredictedUsefulness,
+        PathConditionSize,
+        VisitedAgainVertices,
+        VisitedNotCoveredVerticesInZone,
+        VisitedNotCoveredVerticesOutOfZone,
+        History,
+        Children) =
         {
-            Id = id
-            Position = position
-            PredictedUsefulness = predictedUsefulness
-            PathConditionSize = pathConditionSize
-            VisitedAgainVertices = visitedAgainVertices
-            VisitedNotCoveredVerticesInZone = visitedNotCoveredVerticesInZone
-            VisitedNotCoveredVerticesOutOfZone = visitedNotCoveredVerticesOutOfZone
-            History = history
-            Children = children
+            Id = Id
+            Position = Position
+            PredictedUsefulness = PredictedUsefulness
+            PathConditionSize = PathConditionSize
+            VisitedAgainVertices = VisitedAgainVertices
+            VisitedNotCoveredVerticesInZone = VisitedNotCoveredVerticesInZone
+            VisitedNotCoveredVerticesOutOfZone = VisitedNotCoveredVerticesOutOfZone
+            History = History
+            Children = Children
         }
     
 [<Struct>]    
@@ -114,23 +114,23 @@ type GameMapVertex =
     val TouchedByState: bool
     val States: uint<stateId>[]
     [<JsonConstructor>]
-    new (uid,
-         id,
-         inCoverageZone,
-         basicBlockSize,
-         coveredByTest,
-         visitedByState,
-         touchedByState,
-         states) =
+    new (Uid,
+         Id,
+         InCoverageZone,
+         BasicBlockSize,
+         CoveredByTest,
+         VisitedByState,
+         TouchedByState,
+         States) =
         {
-            Uid = uid
-            Id = id
-            InCoverageZone = inCoverageZone
-            BasicBlockSize = basicBlockSize
-            CoveredByTest = coveredByTest
-            VisitedByState = visitedByState
-            TouchedByState = touchedByState
-            States = states
+            Uid = Uid
+            Id = Id
+            InCoverageZone = InCoverageZone
+            BasicBlockSize = BasicBlockSize
+            CoveredByTest = CoveredByTest
+            VisitedByState = VisitedByState
+            TouchedByState = TouchedByState
+            States = States
         }
 
 [<Struct>]
@@ -145,7 +145,7 @@ type GameMapEdge =
     val VertexTo: uint<basicBlockGlobalId>
     val Label: GameEdgeLabel
     [<JsonConstructor>]
-    new (vFrom, vTo, label) = {VertexFrom = vFrom; VertexTo = vTo; Label = label}
+    new (VertexFrom, VertexTo, Label) = {VertexFrom = VertexFrom; VertexTo = VertexTo; Label = Label}
     
 [<Struct>]
 type GameState =
@@ -154,7 +154,7 @@ type GameState =
     val States: State[]
     val Map: GameMapEdge[]
     // [<JsonConstructor>]
-    new (graphVertices, states, map) = {GraphVertices = graphVertices; States = states; Map = map}
+    new (GraphVertices, States, Map) = {GraphVertices = GraphVertices; States = States; Map = Map}
     
 type [<Measure>] coverageReward
 type [<Measure>] visitedInstructionsReward

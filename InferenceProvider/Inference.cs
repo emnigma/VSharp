@@ -137,17 +137,20 @@ namespace InferenceProvider
             {
                 foreach (var child in state.Children)
                 {
-                    edgesIndexSS.Add(new List<uint> { stateMap[state.Id], stateMap[child] });
+                    if (stateMap.ContainsKey(child))
+                    {
+                        edgesIndexSS.Add(new List<uint> { stateMap[state.Id], stateMap[child] });
+                    }
                 }
             }
             // state position edges: vertex -> state and back
 
             foreach (var vertex in input.GraphVertices)
             {
-                foreach (var state in input.States)
+                foreach (var stateId in vertex.States)
                 {
-                    edgesIndexSVIn.Add(new List<uint> { stateMap[state.Id], vertexMap[vertex.Id] });
-                    edgesIndexVSIn.Add(new List<uint> { vertexMap[vertex.Id], stateMap[state.Id] });
+                    edgesIndexSVIn.Add(new List<uint> { stateMap[stateId], vertexMap[vertex.Id] });
+                    edgesIndexVSIn.Add(new List<uint> { vertexMap[vertex.Id], stateMap[stateId] });
                 }
             }
 
@@ -157,12 +160,12 @@ namespace InferenceProvider
                 edgesIndexVV,
                 edgesIndexVSHistory,
                 edgesAttrsVS,
-                edgesIndexSVIn,
+                edgesIndexVSIn,
                 edgesIndexSS,
                 stateMap);
         }
 
-        private static OrtValue create2DFloatTensor(List<List<uint>> buffer)
+        private static OrtValue Create2DFloatTensor(List<List<uint>> buffer)
         {
             var shape0 = buffer.Count;
             var shape1 = buffer[0].Count;
@@ -171,7 +174,7 @@ namespace InferenceProvider
             return OrtValue.CreateTensorValueFromMemory(sourceData, dimensions);
         }
 
-        private static OrtValue create2DLongTensor(List<List<uint>> buffer)
+        private static OrtValue Create2DLongTensor(List<List<uint>> buffer)
             // prev repeat
         {
             var shape0 = buffer.Count;
@@ -181,7 +184,7 @@ namespace InferenceProvider
             return OrtValue.CreateTensorValueFromMemory(sourceData, dimensions);
         }
 
-        private static uint predictState(List<List<float>> ranks, Dictionary<uint, uint> stateMap)
+        private static uint PredictState(List<List<float>> ranks, Dictionary<uint, uint> stateMap)
         {
             var reverseMap = stateMap.ToDictionary(x => x.Value, x => x.Key);
             var (_, index) = ranks.Select((n, i) => (n.Sum(), i)).Max();
@@ -189,34 +192,31 @@ namespace InferenceProvider
             return reverseMap[Convert.ToUInt32(index)];
         }
 
-        public static uint Infer(NativeInput nativeInput)
+        public static uint Infer(NativeInput nativeInput, InferenceSession session)
         {
             var input = new Dictionary<string, OrtValue>
             {
-                { "game_vertex", create2DFloatTensor(nativeInput.gameVertex) },
-                { "state_vertex", create2DFloatTensor(nativeInput.stateVertex) },
-                { "game_vertex to game_vertex", create2DLongTensor(nativeInput.gameVertexToGameVertex.Transpose()) },
+                { "game_vertex", Create2DFloatTensor(nativeInput.gameVertex) },
+                { "state_vertex", Create2DFloatTensor(nativeInput.stateVertex) },
+                { "game_vertex to game_vertex", Create2DLongTensor(nativeInput.gameVertexToGameVertex.Transpose()) },
                 {
                     "game_vertex history state_vertex index",
-                    create2DLongTensor(nativeInput.gameVertexHistoryStateVertexIndex.Transpose())
+                    Create2DLongTensor(nativeInput.gameVertexHistoryStateVertexIndex.Transpose())
                 },
                 {
                     "game_vertex history state_vertex attrs",
-                    create2DLongTensor(
-                        new List<List<uint>> { nativeInput.gameVertexHistoryStateVertexAttrs }.Transpose())
+                    Create2DLongTensor(nativeInput.gameVertexHistoryStateVertexAttrs
+                        .Select(item => new List<uint> { item }).ToList())
                 },
                 {
-                    "game_vertex in state_vertex", create2DLongTensor(nativeInput.gameVertexInStateVertex.Transpose())
+                    "game_vertex in state_vertex", Create2DLongTensor(nativeInput.gameVertexInStateVertex.Transpose())
                 },
                 {
                     "state_vertex parent_of state_vertex",
-                    create2DLongTensor(nativeInput.stateVertexParentOfStateVertex.Transpose())
+                    Create2DLongTensor(nativeInput.stateVertexParentOfStateVertex.Transpose())
                 }
             };
 
-            string modelPath = "/Users/emax/Data/VSharp/InferenceProvider/test_model.onnx";
-
-            using var session = new InferenceSession(modelPath);
             using var runOptions = new RunOptions();
             var output = session.Run(runOptions, input, session.OutputNames);
             var outputData = output[0].GetTensorDataAsSpan<float>();
@@ -224,10 +224,10 @@ namespace InferenceProvider
             var ranks = outputData.ToArray()
                 .Select((n, i) => new { Value = n, Index = i })
                 .GroupBy(x => x.Index / 8)
-                .Select(grp => grp.Select(X => X.Value).ToList())
+                .Select(grp => grp.Select(x => x.Value).ToList())
                 .ToList();
 
-            return predictState(ranks, nativeInput.stateMap);
+            return PredictState(ranks, nativeInput.stateMap);
         }
 
         public static void Main(string[] args)
@@ -238,7 +238,13 @@ namespace InferenceProvider
             Console.WriteLine(deserializeGameState);
 
             var nativeInput = ConvertToNativeInput(deserializeGameState);
-            var smth = Infer(nativeInput);
+
+            string modelPath = "/Users/emax/Data/VSharp/InferenceProvider/test_model.onnx";
+
+            using var session = new InferenceSession(modelPath);
+            var inferredStateId = Infer(nativeInput, session);
+
+            Console.WriteLine(inferredStateId);
         }
     }
 }
