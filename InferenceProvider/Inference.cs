@@ -184,10 +184,10 @@ namespace InferenceProvider
             return OrtValue.CreateTensorValueFromMemory(sourceData, dimensions);
         }
 
-        private static uint PredictState(List<List<float>> ranks, Dictionary<uint, uint> stateMap)
+        private static uint PredictState(float[] ranks, Dictionary<uint, uint> stateMap)
         {
             var reverseMap = stateMap.ToDictionary(x => x.Value, x => x.Key);
-            var (_, index) = ranks.Select((n, i) => (n.Sum(), i)).Max();
+            var (_, index) = ranks.Select((n, i) => (n, i)).Max();
 
             return reverseMap[Convert.ToUInt32(index)];
         }
@@ -219,13 +219,9 @@ namespace InferenceProvider
 
             using var runOptions = new RunOptions();
             var output = session.Run(runOptions, input, session.OutputNames);
-            var outputData = output[0].GetTensorDataAsSpan<float>();
+            var outputData = output[0].GetTensorDataAsSpan<float>().ToArray();
 
-            var ranks = outputData.ToArray()
-                .Select((n, i) => new { Value = n, Index = i })
-                .GroupBy(x => x.Index / 8)
-                .Select(grp => grp.Select(x => x.Value).ToList())
-                .ToList();
+            var ranks = outputData.ToArray();
 
             return PredictState(ranks, nativeInput.stateMap);
         }
@@ -239,7 +235,7 @@ namespace InferenceProvider
 
             var nativeInput = ConvertToNativeInput(deserializeGameState);
 
-            string modelPath = "/Users/emax/Data/VSharp/InferenceProvider/test_model.onnx";
+            string modelPath = "/Users/emax/Data/VSharp/InferenceProvider/test_model_TAGSageSimple_ll.onnx";
 
             using var session = new InferenceSession(modelPath);
             var inferredStateId = Infer(nativeInput, session);
