@@ -69,6 +69,8 @@ class ServerDataloaderHeteroVector:
                             int(v.CoveredByTest),
                             int(v.VisitedByState),
                             int(v.TouchedByState),
+                            int(v.ContainsCall),
+                            int(v.ContainsThrow),
                         ]
                     )
                 )
@@ -91,11 +93,12 @@ class ServerDataloaderHeteroVector:
                     np.array(
                         [
                             s.Position,
-                            s.PredictedUsefulness,
                             s.PathConditionSize,
                             s.VisitedAgainVertices,
                             s.VisitedNotCoveredVerticesInZone,
                             s.VisitedNotCoveredVerticesOutOfZone,
+                            s.StepWhenMovedLastTime,
+                            s.InstructionsVisitedInCurrentBlock,
                         ]
                     )
                 )
@@ -104,8 +107,12 @@ class ServerDataloaderHeteroVector:
                     v_to = vertex_map[h.GraphVertexId]
                     edges_index_s_v_history.append(np.array([state_index, v_to]))
                     edges_index_v_s_history.append(np.array([v_to, state_index]))
-                    edges_attr_s_v.append(np.array([h.NumOfVisits]))
-                    edges_attr_v_s.append(np.array([h.NumOfVisits]))
+                    edges_attr_s_v.append(
+                        np.array([h.NumOfVisits, h.StepWhenVisitedLastTime])
+                    )
+                    edges_attr_v_s.append(
+                        np.array([h.NumOfVisits, h.StepWhenVisitedLastTime])
+                    )
                 state_index = state_index + 1
             else:
                 state_doubles += 1
